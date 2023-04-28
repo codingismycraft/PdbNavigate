@@ -1,37 +1,8 @@
-
 python3 << endpython
-
-class CodeLine:
-    def __init__(self, filepath=None, linenum=None):
-        self.__filepath = filepath
-        self.__linenum = linenum
-
-    def __repr__(self):
-        return f'CodeLine({self.__filepath}, {self.__linenum})'
-        
-    @property
-    def filepath(self):
-        return self.__filepath
-        
-    @property
-    def linenum(self):
-        return self.__linenum
-
-    def clear(self):
-        self.__linenum = None
-        self._filepath = None
-
-    def set(self, filepath, linenum):
-        assert filepath and linenum
-        self.__filepath = filepath
-        self.__linenum = linenum
-
-_active_line_in_debuger = CodeLine()
 
 def PaintLineAsActiveInDebuger(linenum):
     command = f'matchaddpos("Debug", {linenum})'
     vim.eval(command)
-
 
 def GetLineNumber(s):
     import re
@@ -217,16 +188,12 @@ def LinesToTable(lines):
             yield underline
 endpython
 
-
-
-
 function! pdbnavigate#AddToDebug()
 python3 << endpython
 import vim
 home_dir = vim.eval("""expand("$HOME")""")
 fullpath = vim.eval("""expand("%:p")""")
 linenum = int(vim.eval("""line(".")"""))
-print(linenum)
 UpdateDebugBreakpoints(home_dir, fullpath, linenum)
 endpython
 endfunction
@@ -249,7 +216,6 @@ python3 << endpython
 import vim
 filepath = vim.eval("a:filepath")
 linenum = int(vim.eval("a:linenum"))
-_active_line_in_debuger.set(filepath, linenum)
 endpython
 endfunction
 
@@ -282,10 +248,8 @@ PaintLineAsActiveInDebuger(linenum)
 endpython
 endfunction
 
-
 function! pdbnavigate#ResetCursor()
     execute "highlight CursorLine NONE"
-    echo "Leaving buffer"
 endfunction
 
 
