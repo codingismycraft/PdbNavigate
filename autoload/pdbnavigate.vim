@@ -207,9 +207,22 @@ ClearAllDebugDataPoints(home_dir, fullpath)
 endpython
 endfunction
 
+function! pdbnavigate#ActivateWindow(filepath)
+    " If the passed in file path is already open then the corresponding window 
+    " will be activated. 
+    " Othewise the file will be opened in the active window (overwritting the
+    " existing content).
+    let windowNr = bufwinnr(a:filepath)
+    if windowNr > 0
+        execute windowNr 'wincmd w'
+    else
+        execute "edit". a:filepath
+    endif  
+endfunction
+
 function! pdbnavigate#MoveToLine(filepath, linenum)
 " Activates the file and moves the cursor to the pass in line.
-call ActivateWindow(a:filepath)
+call pdbnavigate#ActivateWindow(a:filepath)
 call cursor(a:linenum, 1)
 execute "hi CursorLine ctermbg=blue"
 python3 << endpython
