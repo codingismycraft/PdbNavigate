@@ -21,3 +21,5 @@ augroup END
 
 highlight Debug ctermbg=Red ctermfg=Cyan
 
+" called when a new document is opened to repaint the breakpoitns.
+autocmd BufWinEnter * :call pdbnavigate#OnOpenDocument()

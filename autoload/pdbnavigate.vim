@@ -265,5 +265,13 @@ function! pdbnavigate#ResetCursor()
     execute "highlight CursorLine NONE"
 endfunction
 
-
+function! pdbnavigate#OnOpenDocument()
+" When a document is opened it paints its breakpoints.
+python3 << endpython
+import vim
+home_dir = vim.eval("""expand("$HOME")""")
+fullpath = vim.eval("""expand("%:p")""")
+PaintDebugLines(home_dir, fullpath)
+endpython
+endfunction
 
