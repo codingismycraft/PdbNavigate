@@ -1,5 +1,4 @@
 python3 << endpython
-
 def PaintLineAsActiveInDebuger(linenum):
     command = f'matchaddpos("Debug", {linenum})'
     vim.eval(command)
@@ -28,6 +27,7 @@ def GetFilename(s):
 def PaintDebugLines(home_dir, filename):
     import os
     import vim
+    current_linenum = int(vim.eval("""line(".")"""))
     vim.eval("""clearmatches()""")
     filename = filename.strip()
     line_numbers = []
@@ -53,6 +53,8 @@ def PaintDebugLines(home_dir, filename):
         command = f'matchaddpos("Debug", {y})'
         vim.eval(command)
         y, x = x[:8], x[8:]
+        
+
 
 
 def ClearAllDebugDataPoints(home_dir, fullpath):
@@ -138,57 +140,12 @@ def UpdateDebugBreakpoints(home_dir, fullpath, linenum):
             fout.write(f"{line}\n")
     
     PaintDebugLines(home_dir, fullpath)
-
-def LinesToTable(lines):
-    """Converts the passed in array of lines to a table.
-
-    :param list[str] lines: The list of lines to convert to a table.
-
-    yields: The lines of the generated table.
-    """
-    import re
-
-    pipe = "|"
-    dash = "-"
-    space = " "
-    comma = ","
-
-    lines = [
-        l.replace(pipe, comma)
-        for l in lines if re.search(r"[^|^-]", l)
-    ]
-
-    wl = []
-    words = []
-    for line_index, line in enumerate(lines):
-        if not line:
-            continue
-        if line and line[0] == comma:
-            line = line[1:]
-        if line and line[-1] == comma:
-            line = line[:-1]
-        words.append([])
-        for i, word in enumerate(line.split(",")):
-            word = word.strip()
-            if i >= len(wl):
-                wl.append(0)
-            wl[i] = max(wl[i], len(word) + 1)
-            words[line_index].append(word)
-    for line_index, w in enumerate(words):
-        line = pipe
-        underline = pipe
-        for i in range(len(wl)):
-            underline += dash * (wl[i] + 1) + pipe
-            if i >= len(w):
-                line += space * (wl[i] + 1) + pipe
-            else:
-                line += space + w[i] + space * (wl[i] - len(w[i])) + pipe
-        yield line
-        if line_index == 0:
-            yield underline
 endpython
 
+
+  
 function! pdbnavigate#AddToDebug()
+let n = line(".")
 python3 << endpython
 import vim
 home_dir = vim.eval("""expand("$HOME")""")
@@ -196,15 +153,18 @@ fullpath = vim.eval("""expand("%:p")""")
 linenum = int(vim.eval("""line(".")"""))
 UpdateDebugBreakpoints(home_dir, fullpath, linenum)
 endpython
+execute ":".n 
 endfunction
 
 function! pdbnavigate#ClearDebug()
+let n = line(".")
 python3 << endpython
 import vim
 home_dir = vim.eval("""expand("$HOME")""")
 fullpath = vim.eval("""expand("%:p")""")
 ClearAllDebugDataPoints(home_dir, fullpath)
 endpython
+execute ":".n
 endfunction
 
 function! pdbnavigate#ActivateWindow(filepath)
