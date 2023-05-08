@@ -1,6 +1,13 @@
 def displayinvim(fullpath):
     """Open a file in Vim and move the cursor to the active line, if available.
 
+    Meant to be called from pdb when there is a movement in the active line;
+    sends a message to the vim process (which in this case acts like a server)
+    calling its MoveToLine VimScript function.
+    
+    To see how this function is called you need to open the .pdbrc file where 
+    a alias must exist to import this module and also call the function.
+
     Prints a message if no active line is found.
 
     Args:
@@ -9,11 +16,21 @@ def displayinvim(fullpath):
     linenum = getactiveline(fullpath)
     if linenum:
         import os
-        cmd = f"""vim --remote-send ":call pdbnavigate#MoveToLine('{fullpath}', {linenum})<CR>"  """
+        cmd = f"""vim --remote-send "<esc>:call pdbnavigate#MoveToLine('{fullpath}', {linenum})<CR>"  """
         os.system(cmd)
     else:
         print("No active line was found..")
 
+
+def reloadBreakpoints(fullpath):
+    """Called when the user changes a breakpoint from the debuger.
+
+    When the used adds or removes a breakpoint form the debuger, this
+    function sends a message to the vim server to refresh the related display.
+    """
+    import os
+    cmd = f"""vim --remote-send "<esc>:call pdbnavigate#RefreshBreakpoints('{fullpath}')<CR>"  """
+    os.system(cmd)
 
 def getactiveline(fullpath):
     """Get the line number of currently executing code in file.

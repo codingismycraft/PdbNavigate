@@ -21,6 +21,7 @@ augroup CursorLine
 augroup END
 
 highlight Debug ctermbg=Red ctermfg=Cyan
-"
+highlight ActiveInDebuger ctermbg=white
+
 "" called when a new document is opened to repaint the breakpoitns.
 autocmd BufWinEnter * :call pdbnavigate#OnOpenDocument()
