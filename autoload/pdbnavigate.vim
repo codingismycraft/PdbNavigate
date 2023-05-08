@@ -1,4 +1,8 @@
+" Last file active in debugger.
+let s:active_filename  = '' 
+
 python3 << endpython
+
 def PaintLineAsActiveInDebuger(linenum):
     command = f'matchaddpos("Debug", {linenum})'
     vim.eval(command)
@@ -182,14 +186,18 @@ endfunction
 
 function! pdbnavigate#MoveToLine(filepath, linenum)
 " Activates the file and moves the cursor to the pass in line.
+if s:active_filename != a:filepath
+    " Debug cursor jumps to other file, clear the existing.
+    match ActiveInDebuger //
+endif
 call pdbnavigate#ActivateWindow(a:filepath)
-call cursor(a:linenum, 1)
-execute "hi CursorLine ctermbg=blue"
 python3 << endpython
 import vim
-filepath = vim.eval("a:filepath")
-linenum = int(vim.eval("a:linenum"))
+linenum = vim.eval("a:linenum")
+cmd = f"match ActiveInDebuger /\%{linenum}l/"
+vim.command(cmd)
 endpython
+let s:active_filename = a:filepath
 endfunction
 
 function! pdbnavigate#ListBuffers()
@@ -235,3 +243,12 @@ PaintDebugLines(home_dir, fullpath)
 endpython
 endfunction
 
+function! pdbnavigate#RefreshBreakpoints(filepath)
+call pdbnavigate#ActivateWindow(a:filepath)
+python3 << endpython
+import vim
+home_dir = vim.eval("""expand("$HOME")""")
+path = vim.eval("a:filepath")
+PaintDebugLines(home_dir, path)
+endpython
+endfunction
