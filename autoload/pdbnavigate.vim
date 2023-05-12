@@ -198,6 +198,10 @@ cmd = f"match ActiveInDebuger /\%{linenum}l/"
 vim.command(cmd)
 endpython
 let s:active_filename = a:filepath
+
+" Now activate the line and also bring it to the middle of the screen,
+execute ":".a:linenum
+execute "normal zz"
 endfunction
 
 function! pdbnavigate#ListBuffers()
